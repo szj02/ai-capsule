@@ -3,14 +3,10 @@
 A small full-stack app for saving and managing AI prompts, protected behind
 GitHub OAuth + an application JWT. Built for CSE3CWA/CSE5006 Assignment 3.
 
-> **TODO before you submit:** fill in every `[FILL IN]` below with your own
-> real values, screenshots and cURL output. Do not leave placeholders in
-> your final submission.
-
 ## 1. Deployed application
 
-- **Public URL:** `[FILL IN — e.g. https://ai-capsule-yourname.onrender.com]`
-- **Cloud platform used:** `[FILL IN — Render / Azure App Service / other]`
+- **Public URL:** `https://ai-capsule-2w8t.onrender.com`
+- **Cloud platform used:** `Render (free Web Service tier)`
 
 ## 2. Tech stack
 
@@ -22,34 +18,33 @@ GitHub OAuth + an application JWT. Built for CSE3CWA/CSE5006 Assignment 3.
 
 ## 3. Project structure
 
-```
 ai-capsule/
 ├── server/
-│   ├── index.js          # Express app entry point, serves API + React build
-│   ├── db.js              # SQLite connection + schema
-│   ├── auth.js             # JWT sign/verify helpers + middleware
-│   └── routes/
-│       ├── auth.js         # /auth/github, /auth/github/callback, /auth/me, /auth/logout
-│       └── capsules.js     # /api/capsules CRUD (all JWT-protected)
-├── client/                 # React app (Vite)
-│   └── src/
-│       ├── pages/Landing.jsx
-│       ├── pages/Login.jsx
-│       └── pages/Dashboard.jsx
+│ ├── index.js # Express app entry point, serves API + React build
+│ ├── db.js # SQLite connection + schema
+│ ├── auth.js # JWT sign/verify helpers + middleware
+│ └── routes/
+│ ├── auth.js # /auth/github, /auth/github/callback, /auth/me, /auth/logout
+│ └── capsules.js # /api/capsules CRUD (all JWT-protected)
+├── client/ # React app (Vite)
+│ └── src/
+│ ├── pages/Landing.jsx
+│ ├── pages/Login.jsx
+│ └── pages/Dashboard.jsx
 ├── .env.example
 └── package.json
-```
+
 
 ## 4. Running locally
 
 ### 4.1 Prerequisites
-- Node.js 18+
+- Node.js 20.x
 - A GitHub account (to register an OAuth App)
 
 ### 4.2 Create a GitHub OAuth App (for local dev)
 1. Go to GitHub → Settings → Developer settings → OAuth Apps → **New OAuth App**.
-2. Homepage URL: `http://localhost:5000`
-3. Authorization callback URL: `http://localhost:5000/auth/github/callback`
+2. Homepage URL: `http://localhost:3000`
+3. Authorization callback URL: `http://localhost:3000/auth/github/callback`
 4. Save the app, then generate a **Client Secret**.
 5. Copy the Client ID and Client Secret.
 
@@ -58,27 +53,21 @@ ai-capsule/
 cp .env.example .env
 ```
 Fill in `.env`:
-```
+
+PORT=3000
 JWT_SECRET=<a long random string>
 GITHUB_CLIENT_ID=<from GitHub OAuth App>
 GITHUB_CLIENT_SECRET=<from GitHub OAuth App>
-GITHUB_CALLBACK_URL=http://localhost:5000/auth/github/callback
-```
+GITHUB_CALLBACK_URL=http://localhost:3000/auth/github/callback
+
 
 ### 4.4 Install and run
 ```bash
 npm install              # installs backend deps + client deps (postinstall)
 npm run build             # builds the React app into client/dist
-npm start                 # starts Express on http://localhost:5000
+npm start                 # starts Express on http://localhost:3000
 ```
-Open `http://localhost:5000`.
-
-For frontend hot-reload during development, you can instead run the
-backend and Vite dev server side by side:
-```bash
-npm run dev:server        # Express on :5000
-npm run dev:client        # Vite dev server on :5173 (proxies /api and /auth to :5000)
-```
+Open `http://localhost:3000`.
 
 ## 5. API routes
 
@@ -141,60 +130,80 @@ No secret values are committed to this repository — see `.gitignore` and
 - SQLite via `better-sqlite3`. Schema created automatically on startup
   (`server/db.js`) if it doesn't already exist.
 - `user_id` on every row is the GitHub user ID taken from the verified JWT.
-- **Persistence:** `[FILL IN — e.g. "Deployed on Render's free web service,
-  whose local filesystem is ephemeral: the SQLite file is recreated (empty)
-  after a restart or redeploy. For this assignment that's acceptable per
-  the spec, but it means data isn't durable across deploys." OR, if you
-  used Render/Azure managed Postgres or a persistent disk, describe that
-  instead.]`
+- **Persistence:** Deployed on Render's free web service tier. The SQLite
+  database file lives on the container's local filesystem, which is
+  ephemeral — it is recreated empty after a restart or redeploy. This is
+  acceptable per the assignment spec but means data is not durable across
+  deploys long-term.
 
 ## 9. Required cURL checks
 
-Run these against your **deployed** URL before submitting, and paste the
-actual output here (and show them live in the video):
+Run against the deployed URL:
 
 ```bash
 # Test 1 - no authentication
-curl -i https://YOUR-APP/api/capsules
+curl -i https://ai-capsule-2w8t.onrender.com/api/capsules
 ```
-```
-[FILL IN — paste the actual response headers/status here, expect 401]
-```
+
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json; charset=utf-8
+{"error":"Unauthorized"}
+
 
 ```bash
 # Test 2 - fake / invalid JWT
-curl -i -H "Cookie: token=fake-token-123" https://YOUR-APP/api/capsules
+curl -i -H "Cookie: token=fake-token-123" https://ai-capsule-2w8t.onrender.com/api/capsules
 ```
-```
-[FILL IN — paste the actual response headers/status here, expect 401]
-```
+
+HTTP/1.1 401 Unauthorized
+Content-Type: application/json; charset=utf-8
+{"error":"Unauthorized"}
+
 
 ## 10. Known limitation
 
-`[FILL IN — one honest limitation, e.g. "SQLite storage is ephemeral on
-Render's free tier and will reset on redeploy" or "Only GitHub OAuth is
-implemented, no Google fallback" or similar.]`
+SQLite storage is ephemeral on Render's free tier and resets on redeploy,
+so capsule data isn't durable long-term without upgrading to a persistent
+disk or managed Postgres.
 
 ## 11. AI-assisted development statement
 
-- **AI tool(s) used:** `[FILL IN — e.g. Claude]`
-- **What it helped with:** `[FILL IN — e.g. scaffolding the Express routes,
-  the OAuth/JWT flow, the React CRUD form, this README structure]`
-- **What I personally completed:** `[FILL IN — e.g. deployed to Render,
-  created the GitHub OAuth App, configured environment variables, tested
-  and fixed the callback URL, verified the cURL checks]`
-- **One problem found and corrected in AI-generated code/config:**
-  `[FILL IN — describe a real bug you hit and how you fixed it, e.g. "the
-  callback URL didn't match between GitHub's OAuth App settings and
-  GITHUB_CALLBACK_URL, causing a redirect_uri_mismatch error — fixed by
-  making them match exactly, including trailing slashes."]`
-- **How OAuth/JWT/protected API behaviour was verified:** `[FILL IN — e.g.
-  "confirmed GET /api/capsules returns 401 with no cookie and with a fake
-  cookie, then confirmed it returns data only after a real GitHub login"]`
-- **How CRUD and ownership were verified:** `[FILL IN — e.g. "created
-  records as one GitHub account, logged in as a second GitHub account, and
-  confirmed the second account could not see, edit or delete the first
-  account's records"]`
-- **One implementation/deployment decision I can explain:** `[FILL IN —
-  e.g. "chose to serve the React build directly from Express instead of a
-  separate frontend host, to avoid CORS and cross-origin cookie issues"]`
+- **AI tool(s) used:** Claude (Anthropic)
+
+- **What it helped with:** Scaffolding the Express backend (routes, JWT
+  middleware, GitHub OAuth flow), the React frontend (CRUD form and
+  dashboard), the deployment configuration for Render, and troubleshooting
+  build errors during deployment.
+
+- **What I personally completed:** Set up and ran the project locally,
+  created the GitHub OAuth Apps (dev and production), created the GitHub
+  repository and pushed the code, created the Render account and
+  configured the Web Service, set all environment variables, diagnosed and
+  fixed two deployment failures by reading Render's build logs, ran and
+  verified both required cURL checks against the deployed URL, and tested
+  full CRUD and login manually in the browser.
+
+- **One problem found and corrected in AI-generated code/config:** During
+  deployment, the build failed with `vite: not found`. I had set
+  `NODE_ENV=production` as an environment variable on Render, which caused
+  npm to skip installing devDependencies (including `vite`, which builds
+  the React app) when the build script ran `npm install` inside the
+  client folder. I fixed this by changing the build script to
+  `npm install --include=dev && npm run build`, forcing dev dependencies
+  to install regardless of `NODE_ENV`.
+
+- **How OAuth/JWT/protected API behaviour was verified:** Confirmed
+  `GET /api/capsules` returns 401 with no cookie and with a fake cookie
+  (`token=fake-token-123`), both locally and against the deployed URL,
+  then confirmed it returns real data only after completing GitHub OAuth
+  login.
+
+- **How CRUD and ownership were verified:** Created, edited, and deleted
+  capsule records through the deployed UI while signed in via GitHub,
+  confirming each operation updates the correct record tied to my GitHub
+  user ID.
+
+- **One implementation/deployment decision I can explain:** Serving the
+  built React frontend directly from the Express server (rather than
+  hosting it separately) so the app and API share one origin, avoiding
+  CORS and cross-origin cookie complications for the JWT auth cookie.
