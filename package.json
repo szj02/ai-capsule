@@ -22,7 +22,7 @@
     "nodemon": "^3.1.0"
   },
   "engines": {
-    "node": ">=18"
+    "node": "20.x" 
   },
   "allowScripts": {
     "better-sqlite3@11.10.0": true
